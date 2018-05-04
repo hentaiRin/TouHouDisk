@@ -1,0 +1,21 @@
+RewriteEngine on
+#RewriteBase /
+#RewriteCond %{SERVER_PORT} !^443$
+#RewriteRule ^.*$ https://%{SERVER_NAME}%{REQUEST_URI} [L,R]
+
+RewriteRule ^large/(.*).(jpg|jpeg|png|gif)$		      uploads/image/large/$1.$2 [L]
+RewriteRule ^original/(.*).(jpg|jpeg|png|gif)$		  uploads/image/original/$1.$2 [L]
+RewriteRule ^small/(.*).(jpg|jpeg|png|gif)$		      uploads/image/small/$1.$2 [L]
+RewriteRule ^big/(.*).(jpg|jpeg|png|gif)$		      uploads/image/big/$1.$2 [L]
+RewriteRule ^little/(.*).(jpg|jpeg|png|gif)$		  uploads/image/little/$1.$2 [L]
+RewriteRule ^normal/(.*).(jpg|jpeg|png|gif)$		  uploads/image/normal/$1.$2 [L]
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_URI} ^/uploads/image/(large/|small/|big/|little/|normal/)
+RewriteRule ^(.*).(jpg|jpeg|png|gif)$ bin [L]
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_URI} !^/(assets/|style/|uploads/)
+RewriteRule ^(.*)$	index.php?/$1?%{QUERY_STRING} [L]

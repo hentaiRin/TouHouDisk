@@ -84,5 +84,49 @@ defined('EXIT_DATABASE')       OR define('EXIT_DATABASE', 8); // database error
 defined('EXIT__AUTO_MIN')      OR define('EXIT__AUTO_MIN', 9); // lowest automatically-assigned error code
 defined('EXIT__AUTO_MAX')      OR define('EXIT__AUTO_MAX', 125); // highest automatically-assigned error code
 
-//mine defined
-defined('VERIFY_KEY')      	   OR define('VERIFY_KEY', 'touhou_project_sako!2017-forever'); // 验证码session下标
+
+# 接口域名
+defined("DOMAIN")              OR define('DOMAIN', "http://sct.cdth.cn/");
+defined("MY_DOMAIN")           OR define('MY_DOMAIN', "http://127.0.0.1/PHP-Sct/");
+defined("APP_DOMAIN")           OR define('APP_DOMAIN', "http://sct.cdth.cn/");
+
+defined('APP_DEFAULT_SIZE')    OR define('APP_DEFAULT_SIZE', 1048576);
+# 后台分页默认大小
+defined('ADMIN_PAGE_SIZE')    OR define('ADMIN_PAGE_SIZE', 10);
+# PC分页默认大小
+defined('PC_PAGE_SIZE')    OR define('PC_PAGE_SIZE', 12);
+
+# 网站名字
+defined('APP_SMS_NAME')					  OR define('APP_SMS_NAME', '顺驰通'); #APP短信名字
+
+# 创新信息短信
+defined('SMS_ID')                         OR define('SMS_ID', 1167); // 创新信息短信服务商ID
+defined('SMS_ACCOUNT')                    OR define('SMS_ACCOUNT', '18781176753'); // 短信帐号
+defined('SMS_PWD')                        OR define('SMS_PWD', '5280201'); // 短信密码
+defined('EX_TIME')						  OR define('EX_TIME', 60); //短信过期时间
+
+
+# 顺驰通微信
+defined('WX_APPID')						  OR define('WX_APPID', 'wx848ae3f6d07751f5'); //微信APPID
+defined('WX_SECRET')					  OR define('WX_SECRET', 'eb352beaf584a376fc1b824daeedbeb8'); //微信app_secret
+
+# 支付宝测试账号
+defined('AIL_PAY_ID')                     OR define('AIL_PAY_ID', '2088711652400440');//APP_ID
+defined('AIL_MD5_KEY')                    OR define('AIL_MD5_KEY', 'l12y1maxca6io5agqyv1v0t4qteaa9fb');//MD5 key
+defined('AIL_PUBLIC_KEY')                 OR define('AIL_PUBLIC_KEY', 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCnxj/9qwVfgoUh/y2W89L6BkRAFljhNhgPdyPuBV64bfQNN1PjbCzkIM6qRdKBoLPXmKKMiFYnkd6rAoprih3/PrQEB/VsW8OoM8fxn67UDYuyBTqA23MML9q1+ilIZwBC2AQ2UBVOrFXfFl75p6/B5KsiNG9zpgmLCUYuLkxpLQIDAQAB');//支付宝公钥
+defined('SELLER_PUBLIC_KEY')              OR define('SELLER_PUBLIC_KEY', 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCogCeEmz0la9PcpOMqNZ1VobvyU3/c12NsL1pVInsmx6DA0Yi4e1bv6uyylMAO/xzGj4cOXjGc4G2IRBn99mtXPSiqUZVLnK4hJL6lfzpuvqmQcD5lesIMOzYiWtFbZ3nn/GxKk8KF/AmyxKAbAL1C08ay9teqijRJ8XciAs5MfwIDAQAB');
+defined('AIL_PRIVATE_KEY')                OR define('AIL_PRIVATE_KEY', 'MIICXAIBAAKBgQCogCeEmz0la9PcpOMqNZ1VobvyU3/c12NsL1pVInsmx6DA0Yi4e1bv6uyylMAO/xzGj4cOXjGc4G2IRBn99mtXPSiqUZVLnK4hJL6lfzpuvqmQcD5lesIMOzYiWtFbZ3nn/GxKk8KF/AmyxKAbAL1C08ay9teqijRJ8XciAs5MfwIDAQABAoGAVb7RXVO6K/7REyj9SI97/wWMpOYE3RbmSzlVmJkxXiycC0MVdfud4/0CcmXrzjXYKNsE+TTJvnEejAdLysbJHAplCm79EOoiNdaJ6POjtR6o04rOyP4QyityIfo000X8ReL3gUcoqjJZOrCuPrzeJJOhG/X0OZ+VuA2/GQQDp7ECQQDS+tbemy+E97XkkyDxjB4VdnIqLZC04f0C8HOXce5oKmyKsWustkMJQqkUAUE/uV/RZVbANyT+AabxXVjgigdFAkEAzHTPCvQXpYdZVCkgccPs4iRRK2GCVvywkihhJ5I7CNz0cRb/hWhVl/kQJ2jcZsCKVgWt5RrST4u6obidbr8u8wJBAMlOVh7o65pv0LpcOB7BlyLbdWsRNvWge42GaISkTNpPQGnFh/uvnJ8FX9aaq+tlsStXCkM1WrKSWPwMGXWFvhECQE+j0GI74lof9rPJsVGfN85+xv9W5CZuF3lXMUDwvP4e0ziZ9L5KfczMv3Yaan+70Cbh33K2l+VUUEZeWzSgU/ECQEWZ7qZAIOea2J0CYLlJmKjMqC5299HBxt8HNKj3CXqg8u/onQ77og+ViyM70L5gBCrKQoBy/Yt9pLsaMNHbzOE=');
+
+# 微信帐号
+defined('WX_APP_ID')                      OR define('WX_APP_ID', 'wxdcfea164e171dc90'); // 微信appid
+defined('WX_MCH_ID')                      OR define('WX_MCH_ID', '1262914601'); // 微信商户号
+defined('WX_KEY')                         OR define('WX_KEY', 'c56430cd1ea01885234b75d7a2ee00a1'); // 商户KEY
+defined('WX_CALLBACK_URL')                OR define('WX_CALLBACK_URL', DOMAIN."Wallet/wx_callback");
+
+# 功能限制
+defined('CASH_MODE')					  OR define('CASH_MODE', 0); //测试模式 0  正常模式 1
+
+
+# qq互联账号
+defined('QQ_APP_ID')                      OR define('QQ_APP_ID', '101388636'); //QQ应用APP_ID
+defined('QQ_APP_KEY')					  OR define('QQ_APP_KEY', '1ea1a0df6a8180604b7b17cf771be3df'); //QQ应用APP_KEY

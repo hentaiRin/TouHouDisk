@@ -11,6 +11,25 @@ class Common
 	{
 		$this->CI = & get_instance();
 	}
+
+// ------------------------------------------------------------------------ 接口数据处理块
+
+	/**
+	 * [PostStringToArray POST获取字符串转Array]
+	 * 格式:A=a&B=b
+	 */
+	public function PostStringToArray()
+	{
+		$remoteData = file_get_contents("php://input");
+		$remote = explode('&',$remoteData);
+		$data = array();
+		foreach ($remote as $item){
+			$temp = explode('=',$item);
+			$data[$temp[0]] = $temp[1];
+		}
+		return $data;
+	}
+
 	/**
 	 * [PostParamsToArray 接口返回$_Post获取Array]
 	 * 请求中ContentType 必须为 application/x-www-form-urlencoded
@@ -31,6 +50,40 @@ class Common
 	{
 		$data = $_GET;
 		return self::FilterData($data);
+	}
+
+	/**
+	 * [GetXmlToArray 微信返回解析]
+	 */
+	public function GetXmlToArray()
+	{
+		$postStr = file_get_contents('php://input');
+		$msg = (array)simplexml_load_string($postStr, 'SimpleXMLElement', LIBXML_NOCDATA);
+		return $msg;
+	}
+
+	/**
+	 * [GetIpAddress 获取客户端IP地址]
+	 */
+	public function GetIpAddress()
+	{
+		if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+	        $ip = $_SERVER['HTTP_CLIENT_IP'];
+	    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+	        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+	    } else {
+	        $ip = $_SERVER['REMOTE_ADDR'];
+	    }
+	    return $ip;
+	}
+
+	/**
+	 * [GetClinetType 获取客户端类型]
+	 */
+	public function GetClinetType()
+	{
+		$clinet = $_SERVER['HTTP_USER_AGENT'];
+		return $clinet;
 	}
 
 	/**
@@ -105,6 +158,23 @@ class Common
 	    return $str;
 	}
 
+	/**
+   * [GenCaptcha 生成随机字符串-验证码]
+   * @param [type] $len   [长度]
+   * @param [type] $chars [自定义字符]
+   */
+	public function GenAdminCaptcha($len = 4, $chars = null)
+	{
+	    if (is_null($chars)){
+	    	$chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+	    }
+	    mt_srand(10000000*(double)microtime());
+	    for ($i = 0, $str = '', $lc = strlen($chars)-1; $i < $len; $i++){
+	        $str .= $chars[mt_rand(0, $lc)];
+	    }
+	    return $str;
+	}
+
   /**
    * GUID唯一编码
    */
@@ -117,6 +187,18 @@ class Common
 	    substr($charid,16, 4).
 	    substr($charid,20,12);
 	    return $uuid;
+	}
+
+	/**
+	 * [buildOrderNo 生成订单编号]
+	 * @return [int] [返回订单编号]
+	 */
+	function buildOrderNo($mid = '')
+	{
+		/* 选择一个随机的方案 */
+		//mt_srand((double) microtime() * 1000000);
+		//return date('Ymd') . uniqid() .str_pad($mid,3,0,STR_PAD_LEFT);
+		return date('Ymd').substr(implode(NULL, array_map('ord', str_split(substr(uniqid(), 7, 13), 1))), 0, 8);
 	}
 
 // ------------------------------------------------------------------------ 数据安全处理块
@@ -199,6 +281,7 @@ class Common
 				$data = array('code' => $code, 'time' => time());
 				break;
 		}
+		header('Access-Control-Allow-Origin:*');
 		echo json_encode($data, JSON_UNESCAPED_UNICODE);
 		exit();
 	}
@@ -239,4 +322,172 @@ class Common
  		return round($s,$decimal);
  	}
 
+ 	/**
+ 	 * [ParseXml 解析微信XML信息]
+ 	 * @param [字符串] $xml [xml信息]
+ 	 * @return [array] 数组
+ 	 */
+ 	public function ParseXml($xml)
+	{
+		$data = (array)simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
+		return $data;
+	}
+
+
+	/**
+	 * [CovertXml 把数组转XML]
+	 * @param [type] $data [description]
+	 */
+	public function CovertXml($data)
+	{
+		$xml = "<?xml version='1.0' encoding='utf-8'?><xml>";
+		foreach($data as $key=>$value){
+			$xml = $xml."<$key>$value</$key>";
+		}
+		$xml = $xml."</xml>";
+		return $xml;
+	}
+
+	/**
+	 * [encrypto 对字符串进行正序排序后sha1加密]
+	 * @param  [string] $str [来源字符串]
+	 * @return [string]      [加密字符串]
+	 */
+	public function encrypto($str)
+	{
+		$str = $str."gxssh2016";
+		$arr=str_split($str);//提取出字符，放入数组
+		usort($arr,'strcmp');//对字符数组进行排序
+		$str=implode('',$arr);//形成排序后的字符串
+		return sha1($str); //sha1加密
+	}
+
+	// ------------------------------------------------------------------------ 短信接口
+
+	protected function Post($data, $target) {
+	    $url_info = parse_url($target);
+	    $httpheader = "POST " . $url_info['path'] . " HTTP/1.0\r\n";
+	    $httpheader .= "Host:" . $url_info['host'] . "\r\n";
+	    $httpheader .= "Content-Type:application/x-www-form-urlencoded\r\n";
+	    $httpheader .= "Content-Length:" . strlen($data) . "\r\n";
+	    $httpheader .= "Connection:close\r\n\r\n";
+	    //$httpheader .= "Connection:Keep-Alive\r\n\r\n";
+	    $httpheader .= $data;
+
+	    $fd = fsockopen($url_info['host'], 80);
+	    fwrite($fd, $httpheader);
+	    $gets = "";
+	    while(!feof($fd)) {
+	        $gets .= fread($fd, 128);
+	    }
+	    fclose($fd);
+	    return $gets;
+	}
+
+	/**
+	 * [send_sms 短信验证码]
+	 * @param  [type]  $phone [手机号码]
+	 * @param  integer $type  [短信用途]
+	 * @return [type]         [返回是否成功]
+	 */
+	public function send_sms($phone, $type = 1, $nickname = "", $orderSN = "", $expressName = "")
+	{
+		$smsCode = rand(0,9).rand(0,9).rand(0,9).rand(0,9).rand(0,9).rand(0,9);
+		switch ($type) {
+			# 注册
+			case 1:
+				$content = "【".APP_SMS_NAME."】"."您好，您此次验证码为".$smsCode."，请您尽快注册。验证码有效时间为".EX_TIME."分钟。";
+				break;
+			# 登录
+			case 2:
+				$content = "【".APP_SMS_NAME."】"."您好，您此次验证码为".$smsCode."，请您尽快登录。验证码有效时间为".EX_TIME."分钟。";
+				break;
+			# 忘记密码
+			case 3:
+				$content = "【".APP_SMS_NAME."】"."您好，您此次验证码为".$smsCode."，请您尽快验证修改密码。验证码有效时间为".EX_TIME."分钟。";
+				break;
+			# 更换手机号
+			case 4:
+				$content = "【".APP_SMS_NAME."】"."您好，您此次验证码为".$smsCode."，请您尽快更改手机号。验证码有效时间为".EX_TIME."分钟。";
+				break;
+			# 支付密码
+			case 5:
+				$content = "【".APP_SMS_NAME."】"."您好，您此次验证码为".$smsCode."，请您尽快验证修改支付密码。验证码有效时间为".EX_TIME."分钟。";
+				break;
+            # 绑定手机号
+            case 6:
+                $content = "【".APP_SMS_NAME."】"."您好，您此次验证码为".$smsCode."，请您尽快绑定手机号。验证码有效时间为".EX_TIME."分钟。";
+                break;
+			default:
+				self::StatusCode(210, "暂无该类型短信验证!");
+				break;
+		}
+		// $target = "http://dc.28inter.com/sms.aspx";
+		// //替换成自己的测试账号,参数顺序和wenservice对应
+		// $post_data = "action=send&userid=&account=myapcr&password=my2015hter&mobile=$phone&sendTime=&content=".rawurlencode("$content");
+		// //$binarydata = pack("A", $post_data);
+		// $gets = self::Post($post_data, $target);
+		// $start = strpos($gets,"<?xml");
+		// $data = substr($gets,$start);
+		// $xml = simplexml_load_string($data);
+		// var_dump(json_decode(json_encode($xml),TRUE));
+		//请自己解析$gets字符串并实现自己的逻辑
+		//<State>0</State>表示成功,其它的参考文档
+		$post_data = array();
+		$post_data['userid'] = SMS_ID;
+		$post_data['account'] = SMS_ACCOUNT;
+		$post_data['password'] = SMS_PWD;
+		$post_data['mobile'] = "$phone";
+		$sendTime = date("Y-m-d H:i:s");
+		$post_data['sendtime'] ='';//sendTime;
+
+		//中文需要转换为UTF8编码格式提交
+		$post_data['content'] = $content;//iconv('GB2312', 'UTF-8', '$content');
+		$url='http://dc.28inter.com/sms.aspx?action=send';
+
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_URL,$url);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); //如果需要将结果直接返回到变量里，那加上这句。
+		$result = curl_exec($ch);
+		//$data = explode(" ",$result);
+		$data = (array)simplexml_load_string($result, 'SimpleXMLElement', LIBXML_NOCDATA);
+		if($data['returnstatus'] == "Success" && $data['message'] == "ok"){
+			$microtime = strtotime($sendTime);
+			$sms = array(
+				'phone' => $phone,
+				'type' => $type,
+				'sms_code' => $smsCode,
+				'send_time' => $microtime,
+				'expire_time' => ($microtime + (EX_TIME * 60))
+				);
+			return $sms;
+		}else{
+			self::StatusCode(210, $data['message']);
+		}
+	}
+
+	/**
+	 * [verifySMS 校验短信]
+	 * @param [string] [手机号码]
+	 * @param [string] [手机验证码]
+	 * 
+	 * @return [type] [返回验证信息]
+	 */
+	public function verifySMS($toPhone, $smsCode, $type)
+	{
+		$arr = $this->CI->session->tempdata();
+		log_message('error',"校验短信:".json_encode($arr));
+		$phone = $this->CI->session->tempdata('phone'); #接受短信的手机号
+		$useMethod = $this->CI->session->tempdata('type'); #短信用途
+		$sms = $this->CI->session->tempdata('sms_code'); #验证码
+		$time = $this->CI->session->tempdata('expire_time'); #过期时间
+		if($toPhone == $phone && $smsCode == $sms && time() <= $time && $type == $useMethod){
+			return true;
+		}else{
+			return false;
+		}
+	}
 }

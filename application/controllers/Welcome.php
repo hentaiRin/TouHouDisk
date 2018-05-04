@@ -1,6 +1,8 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-
+/**
+ * 欢迎界面
+ */
 class Welcome extends CI_Controller {
 
 	/**
@@ -20,6 +22,6 @@ class Welcome extends CI_Controller {
 	 */
 	public function index()
 	{
-		$this->load->view('welcome_message');
+		echo 'Happy Helloween!!';
 	}
 }
